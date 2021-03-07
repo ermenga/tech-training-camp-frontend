@@ -214,11 +214,12 @@
     }
     function sendData (myText, reset) {
         var ajaxObj = new XMLHttpRequest();
+        let addressUri = 'http://localhost:3000/';
         if (myText) {
             myText = myText.replace(/(\r\n|\n|\r)/gm, "<br/>");
-            ajaxObj.open('get', 'http://localhost:3000/?data=' + encodeURI(myText));
+            ajaxObj.open('get', addressUri + '?data=' + encodeURI(myText));
         } else {
-            ajaxObj.open('get', 'http://localhost:3000/');
+            ajaxObj.open('get', addressUri);
         }
         ajaxObj.send();
         ajaxObj.onreadystatechange = function () {
