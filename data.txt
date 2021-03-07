@@ -1,0 +1,1 @@
+​```javascript<br/>for (var i=0; i<100; i  ) {<br/>    console.log("hello world",i);<br/>}<br/>​```<br/>> 引用本意是引用别人的话之类  <br/>> 但我个人喜欢把引用当成"注意"使用  <br/><br/>* Item 1<br/>* Item 2<br/>* Item 3<br/><br/>1. Item 1<br/>2. Item 2<br/>3. Item 3<br/><br/>*This text will be italic*<br/>_This will also be italic_<br/><br/>**This text will be bold**<br/>__This will also be bold__<br/><br/>

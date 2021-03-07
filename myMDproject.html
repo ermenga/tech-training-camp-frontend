@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>markdown项目</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+    <!-- <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+    <style>
+    code {
+        color:#D34B62;
+        background: #F6F6F6;
+        white-space: pre-wrap;
+        border-radius: 2px;
+        display: inline;
+    }
+
+    pre {
+        font-size: 15px;
+        line-height: 1.4em;
+        display: block !important;
+    }
+
+    pre code {
+        white-space: pre;
+        overflow: auto;
+        border-radius: 3px;
+        padding: 1px 1px;
+        display: block !important;
+    }
+
+    strong,
+    b {
+        color: #BF360C;
+    }
+
+    em,
+    i {
+        color: #009688;
+    }
+
+    hr {
+        border: 1px solid #BF360C;
+        margin: 1.5em auto;
+    }
+
+    p {
+        margin: 1.5em 5px !important;
+    }
+
+    table,
+    pre,
+    dl,
+    blockquote,
+    q,
+    ul,
+    ol {
+        margin: 10px 5px;
+    }
+
+    ul,
+    ol {
+        padding-left: 15px;
+    }
+
+    li {
+        margin: 10px;
+    }
+
+    li p {
+        margin: 10px 0 !important;
+    }
+
+    ul ul,
+    ul ol,
+    ol ul,
+    ol ol {
+        margin: 0;
+        padding-left: 10px;
+    }
+
+    ul {
+        list-style-type: circle;
+    }
+
+    dl {
+        padding: 0;
+    }
+
+    dl dt {
+        font-size: 1em;
+        font-weight: bold;
+        font-style: italic;
+    }
+
+    dl dd {
+        margin: 0 0 10px;
+        padding: 0 10px;
+    }
+
+    blockquote,
+    q {
+        border-left: 2px solid #009688;
+        padding: 0 10px;
+        color: #777;
+        quotes: none;
+        margin-left: 1em;
+    }
+
+    blockquote::before,
+    blockquote::after,
+    q::before,
+    q::after {
+        content: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 20px 0 10px;
+        padding: 0;
+        color: #009688 !important;
+        text-align: center !important;
+        margin: 1.5em 5px !important;
+        padding: 0.5em 1em !important;
+    }
+    
+    #oriContent {
+        height: 600px;
+        width: 600px;
+    }
+
+    .tool {
+        -webkit-user-select: none;
+        user-select: none;
+        padding: 0px 25px;
+        font-size: 25px;
+        color: lightsteelblue;
+    }
+
+    .tool:hover {
+        color: aquamarine;
+    }
+
+    .cell {
+        vertical-align: top;
+        min-width: 600px;
+    }
+    </style>
+</head>
+
+<body>
+
+<div>
+    <table>
+        <tr>
+            <td colspan="2">
+                <strong class="tool" onclick="untils('b')">B</strong>
+                <i class="tool" onclick="untils('i')">I</i>
+                <del class="tool" onclick="untils('s')">S</del>
+                <strong><i class="tool" onclick="untils('bi')">BI</i></strong>
+                <u class="tool" onclick="untils('u')">U</u>
+                <span class="tool" onclick="untils('h1')">H1</span>
+                <span class="tool" onclick="untils('h2')">H2</span>
+                <span class="tool" onclick="untils('h3')">H3</span>
+                <span class="tool" onclick="untils('--')">--</span>
+                <span class="tool" onclick="untils('ol')">OL</span>
+                <span class="tool" onclick="untils('ul')">UL</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="cell"><textarea id="oriContent" onkeyup="convert()"></textarea></td>
+            <td class="cell"><div id="result"></div></td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    function convert() {
+        var text = document.getElementById("oriContent").value;
+        var converter = new showdown.Converter();
+        var html = converter.makeHtml(text);
+        document.getElementById("result").innerHTML = html;
+        sendData(document.getElementById("oriContent").value, false);
+    }
+    function untils(choice) {
+        var text = document.getElementById("oriContent");
+        if (window.getSelection) {
+            if (text.selectionStart != undefined && text.selectionEnd != undefined) {
+                let changeMap = {
+                    "i": ["*", "*", true],
+                    "b": ["**", "**", true],
+                    "bi": ["***", "***", true],
+                    "u": ["<u>", "</u>", true],
+                    "s": ["<s>", "</s>", true],
+                    "h1": ["# ", "", false],
+                    "h2": ["## ", "", false],
+                    "h3": ["### ", "", false],
+                    "--": ["", "\n------------\n", false],
+                    "ol": ["1. ", "", false],
+                    "ul": ["- ", "" , false]
+                }
+                if ((text.selectionEnd == 0 || text.selectionStart >= text.selectionEnd) && changeMap[choice][2]) {
+                    alert("未选中文字");
+                } else {
+                    text.value = text.value.slice(0, text.selectionStart) + changeMap[choice][0] + text.value.slice(text.selectionStart);
+                    text.value = text.value.slice(0, text.selectionEnd) + changeMap[choice][1] + text.value.slice(text.selectionEnd);
+                    convert();
+                }
+            }
+        }
+    }
+    function sendData (myText, reset) {
+        var ajaxObj = new XMLHttpRequest();
+        if (myText) {
+            myText = myText.replace(/(\r\n|\n|\r)/gm, "<br/>");
+            ajaxObj.open('get', 'http://localhost:3000/?data=' + encodeURI(myText));
+        } else {
+            ajaxObj.open('get', 'http://localhost:3000/');
+        }
+        ajaxObj.send();
+        ajaxObj.onreadystatechange = function () {
+            if (ajaxObj.readyState == 4 && ajaxObj.status == 200 && reset) {
+                let ret = decodeURI(ajaxObj.responseText);
+                document.getElementById("oriContent").value = ret.replaceAll("<br/>", "\n");
+                convert();
+            }
+        }
+    }
+    sendData(null, true);
+</script>
+
+</body>
+</html>
