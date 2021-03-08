@@ -178,6 +178,20 @@
 </div>
 
 <script>
+    var addressUri;
+    window.onload = function () {
+        let request = new XMLHttpRequest();
+        request.open("get", "assets.json");
+        request.send(null);
+        request.onload = function () {
+            if (request.status == 200) {
+                let json = JSON.parse(request.responseText);
+                addressUri = json.serverUri;
+            } else {
+                console.log("读取服务器地址失败-请手动配置addressUri");
+            }
+        }
+    }
     function convert() {
         var text = document.getElementById("oriContent").value;
         var converter = new showdown.Converter();
@@ -214,7 +228,6 @@
     }
     function sendData (myText, reset) {
         var ajaxObj = new XMLHttpRequest();
-        let addressUri = 'http://localhost:3000/';
         if (myText) {
             myText = myText.replace(/(\r\n|\n|\r)/gm, "<br/>");
             ajaxObj.open('get', addressUri + '?data=' + encodeURI(myText));

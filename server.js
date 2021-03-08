@@ -9,7 +9,11 @@ app.listen(3000, () => {
     console.log('服务启动');
 })
 
-var fileAddress = 'D:/project/data.txt';
+let assets = require("./assets.json");
+var fileAddress = assets.dataAddress;
+if (!fileAddress) {
+    console.log("配置储存文件失败-请手动配置fileAddress")
+}
 
 app.get('/', (req, res) => {
 	var arg = url.parse(req.url).query;
