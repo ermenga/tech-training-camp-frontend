@@ -3,6 +3,7 @@
 1. 前端代码：myMDproject.html
 2. 运行在服务器上的node.js代码：server.js
 3. 存储在服务器上的数据：data.txt
+4. 配置文件：assets.json
 
 # 代码结构
 1. HTML页面构成
@@ -24,17 +25,20 @@
     * sendData(myText, reset)：与服务器交互的代码，更新代码到data.txt与读取data.txt到`textarea`中
         * 第一个参数是即将上传的文本内容，如果为空则表示想要读，这时候会返回data.txt中的数据
         * 第二个参数是是否需要更新`textarea`中的内容，可以防止与convert反复调用
-        * 其中addressUri代表服务的地址，可以再额外新建一个json配置文件来动态更改
+        * 其中addressUri代表服务的地址，可以在assets.json配置文件中来动态更改服务地址
 5. server.js服务程序
     * 本服务与HTML页面约定好一个规则，即参数data如果为空，则读取，反之则写入
-    * 与addressUri相同，这个服务程序得变量fileAddress也应该在配置文件中体现，代表存储文件地址
+    * 与addressUri相同，这个服务程序得变量fileAddress也可以在配置文件中更改，代表存储文件地址
     * get方法不够安全，只是为了测试简便，可以使用post来进一步升级
     * cors可以防止跨域请求被阻止的问题
+6. assets.json配置文件
+    * dataAddress代表data.txt在服务器上的储存路径
+    * serverUri代表node服务的服务地址
 
 # 项目配置须知
 下载项目到本地后，需要适配本机做一些变更
-1. 更改server.js的fileAddress为当前环境下data.txt的绝对路径
+1. 更改assets.json的dataAddress为当前环境下data.txt的绝对路径
 2. 开启IIS服务（或其他部署环境均可），此地址称为网页地址
 3. 在MDproject文件夹下使用node server.js命令，获得服务地址
-4. 将myMDproject.html的addressUri设置成刚刚开启的服务地址
+4. 更改assets.json的serverUri为刚刚开启的服务地址
 5. 直接访问网页地址或在服务器端使用IIS浏览myMDproject.html文件即可
