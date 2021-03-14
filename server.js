@@ -12,12 +12,12 @@ app.listen(3000, () => {
 let assets = require("./assets.json");
 var fileAddress = assets.dataAddress;
 if (!fileAddress) {
-    console.log("配置储存文件失败-请手动配置fileAddress")
+    console.log("配置储存文件失败-请手动配置fileAddress");
 }
 
 app.get('/', (req, res) => {
-	var arg = url.parse(req.url).query;
-	var params = querystring.parse(arg);
+    var arg = url.parse(req.url).query;
+    var params = querystring.parse(arg);
     console.log(params.data);
     if (params.data) {
         fs.writeFile(fileAddress, params.data, function (error) {
@@ -34,7 +34,11 @@ app.get('/', (req, res) => {
             if (error) {
                 console.log('读取文件失败')
             } else {
-                res.send(data.toString());
+                if(data) {
+                    res.send(data.toString());
+                } else {
+                    res.send("");
+                }
             }
         })
     }

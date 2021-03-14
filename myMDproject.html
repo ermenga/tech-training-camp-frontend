@@ -3,9 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>markdown项目</title>
-    <script src="https://cdn.bootcdn.net/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
-    <!-- <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/marked/1.2.7/marked.js"></script>
+    <!-- 
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> 
+        <script src="https://cdn.bootcdn.net/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+    -->
     <style>
+
+    table,
+    table tr th,
+    table tr td { 
+        border:1px solid #0094ff;
+    }
+    table { 
+        width: 200px;
+        min-height: 25px;
+        line-height: 25px;
+        text-align: center;
+        border-collapse: collapse;
+        padding:2px;
+    }
+
     code {
         color:#D34B62;
         background: #F6F6F6;
@@ -126,7 +145,22 @@
         margin: 1.5em 5px !important;
         padding: 0.5em 1em !important;
     }
-    
+
+    #parent {
+        float: left;
+        width: 100%;
+    }
+    #left {
+        float: left;
+        width: 50%;
+        min-width: 600px;
+    }
+    #right {
+        float: right;
+        width: 50%;
+        min-width: 600px;
+    }
+
     #oriContent {
         height: 600px;
         width: 600px;
@@ -143,42 +177,42 @@
     .tool:hover {
         color: aquamarine;
     }
-
-    .cell {
-        vertical-align: top;
-        min-width: 600px;
-    }
     </style>
 </head>
 
 <body>
 
-<div>
-    <table>
-        <tr>
-            <td colspan="2">
-                <strong class="tool" onclick="untils('b')">B</strong>
-                <i class="tool" onclick="untils('i')">I</i>
-                <del class="tool" onclick="untils('s')">S</del>
-                <strong><i class="tool" onclick="untils('bi')">BI</i></strong>
-                <u class="tool" onclick="untils('u')">U</u>
-                <span class="tool" onclick="untils('h1')">H1</span>
-                <span class="tool" onclick="untils('h2')">H2</span>
-                <span class="tool" onclick="untils('h3')">H3</span>
-                <span class="tool" onclick="untils('--')">--</span>
-                <span class="tool" onclick="untils('ol')">OL</span>
-                <span class="tool" onclick="untils('ul')">UL</span>
-            </td>
-        </tr>
-        <tr>
-            <td class="cell"><textarea id="oriContent" onkeyup="convert()"></textarea></td>
-            <td class="cell"><div id="result"></div></td>
-        </tr>
-    </table>
+<div id="parent">
+    <div>
+        <strong class="tool" onclick="untils('b')">B</strong>
+        <i class="tool" onclick="untils('i')">I</i>
+        <del class="tool" onclick="untils('s')">S</del>
+        <strong><i class="tool" onclick="untils('bi')">BI</i></strong>
+        <u class="tool" onclick="untils('u')">U</u>
+        <span class="tool" onclick="untils('h1')">H1</span>
+        <span class="tool" onclick="untils('h2')">H2</span>
+        <span class="tool" onclick="untils('h3')">H3</span>
+        <span class="tool" onclick="untils('--')">--</span>
+        <span class="tool" onclick="untils('ol')">OL</span>
+        <span class="tool" onclick="untils('ul')">UL</span>
+    </div>
+    <div id="left"><textarea id="oriContent" onkeyup="convert()"></textarea></div>
+    <div id="right"><div id="result"></div></div>
 </div>
 
 <script>
     var addressUri;
+    var rendererMD = new marked.Renderer();
+    marked.setOptions({
+        renderer: rendererMD,
+        gfm: true,
+        tables: true,
+        breaks: false,
+        pedantic: false,
+        sanitize: false,
+        smartLists: true,
+        smartypants: false
+    });
     window.onload = function () {
         let request = new XMLHttpRequest();
         request.open("get", "assets.json");
@@ -190,14 +224,13 @@
             } else {
                 console.log("读取服务器地址失败-请手动配置addressUri");
             }
+            sendData(null, true);
         }
     }
     function convert() {
         var text = document.getElementById("oriContent").value;
-        var converter = new showdown.Converter();
-        var html = converter.makeHtml(text);
-        document.getElementById("result").innerHTML = html;
-        sendData(document.getElementById("oriContent").value, false);
+        document.getElementById("result").innerHTML = marked(text);
+        sendData(text, false);
     }
     function untils(choice) {
         var text = document.getElementById("oriContent");
@@ -208,7 +241,7 @@
                     "b": ["**", "**", true],
                     "bi": ["***", "***", true],
                     "u": ["<u>", "</u>", true],
-                    "s": ["<s>", "</s>", true],
+                    "s": ["~~", "~~", true],
                     "h1": ["# ", "", false],
                     "h2": ["## ", "", false],
                     "h3": ["### ", "", false],
@@ -219,15 +252,15 @@
                 if ((text.selectionEnd == 0 || text.selectionStart >= text.selectionEnd) && changeMap[choice][2]) {
                     alert("未选中文字");
                 } else {
-                    text.value = text.value.slice(0, text.selectionStart) + changeMap[choice][0] + text.value.slice(text.selectionStart);
-                    text.value = text.value.slice(0, text.selectionEnd) + changeMap[choice][1] + text.value.slice(text.selectionEnd);
+                    text.value = text.value.slice(0, text.selectionStart) + changeMap[choice][0] +
+                        text.value.slice(text.selectionStart, text.selectionEnd) + changeMap[choice][1] + text.value.slice(text.selectionEnd);
                     convert();
                 }
             }
         }
     }
     function sendData (myText, reset) {
-        var ajaxObj = new XMLHttpRequest();
+        let ajaxObj = new XMLHttpRequest();
         if (myText) {
             myText = myText.replace(/(\r\n|\n|\r)/gm, "<br/>");
             ajaxObj.open('get', addressUri + '?data=' + encodeURI(myText));
@@ -243,7 +276,6 @@
             }
         }
     }
-    sendData(null, true);
 </script>
 
 </body>
