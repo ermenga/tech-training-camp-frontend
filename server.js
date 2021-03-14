@@ -34,11 +34,7 @@ app.get('/', (req, res) => {
             if (error) {
                 console.log('读取文件失败')
             } else {
-                if(data) {
-                    res.send(data.toString());
-                } else {
-                    res.send("");
-                }
+                res.send(data.toString());
             }
         })
     }
